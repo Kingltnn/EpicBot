@@ -52,7 +52,7 @@
             "check": true,
             "lifepotion": {
                 "autouse": true,
-                "hplimit": 10
+                "hplimit": 100
             },
             "lootbox": {
                 "autouse": true,

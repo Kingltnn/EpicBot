@@ -47,7 +47,7 @@
             "autospecialtrade": true,
             "autoarena": true
         },
-        "captcha_alert_channelid": "https://discord.com/api/webhooks/1379633373735288942/zysRbg09bdw736bWSf77gzqLhNzvWbafSyjyMbP1w2KF26BqT-8sgK2B3H3XuUPyQf_U",
+        "captcha_alert_channelid": "",
         "inventory": {
             "check": true,
             "lifepotion": {
@@ -90,7 +90,7 @@
             }
         },
         "lootbox": true,
-        "lootbox_webhook_url": "https://discord.com/api/webhooks/1386524045633126410/Ihca_TGVcvXtIaA25ITeUYICxlWZoPGQSoMKQRhVLKjdx8BRnPezlnxkilsxo5pvL5Xi",
+        "lootbox_webhook_url": "",
         "lootbox_buy": {
             "types": {
                 "rare lootbox": false,

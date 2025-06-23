@@ -30,6 +30,19 @@ module.exports = async (client, message) => {
                 wait: true,
                 appID: "EpicRPG Farm Bot",
             });
+            // Thông báo đến Discord channel nếu có cấu hình
+            if (client.config.settings.captcha_alert_channelid && client.channels.cache.has(client.config.settings.captcha_alert_channelid)) {
+                const alertChannel = client.channels.cache.get(client.config.settings.captcha_alert_channelid);
+                alertChannel.send({ content: `@here, ${client.user.username} ⚠️ **Captcha Detected!**\nPlease solve the captcha and type \`${client.config.prefix}resume\` in farm channel.` });
+            }
+            // Gửi webhook nếu captcha_alert_channelid là webhook URL
+            if (client.config.settings.captcha_alert_channelid && client.config.settings.captcha_alert_channelid.startsWith('http')) {
+                client.axios.post(client.config.settings.captcha_alert_channelid, {
+                    content: `@here, ${client.user.username} ⚠️ **Captcha Detected!**\nPlease solve the captcha and type \`${client.config.prefix}resume\` in farm channel.`
+                }).catch(err => {
+                    logger.warn('Webhook', 'Captcha', `Gửi webhook captcha thất bại: ${err.message}`);
+                });
+            }
         }
         if (
             msgcontent.includes("**epic guard**: everything seems fine") ||
@@ -290,11 +303,15 @@ module.exports = async (client, message) => {
         !message.content &&
         !message.interaction &&
         message.embeds &&
-        message.embeds[0].type
+        message.embeds.length > 0 &&
+        message.embeds[0] &&
+        message.embeds[0].fields &&
+        message.embeds[0].fields.length > 0
     ) {
         if (client.config.settings.event.autojoin) {
-            if (message.embeds[0].fields[0].name) {
-                let event = message.embeds[0].fields[0].name;
+            const eventField = message.embeds[0].fields[0];
+            if (eventField && eventField.name) {
+                let event = eventField.name;
                 if (
                     event.toLowerCase().includes("an epic tree has just grown")
                 ) {
@@ -324,8 +341,9 @@ module.exports = async (client, message) => {
             }
         }
         if (client.config.settings.event.autospecialtrade) {
-            if (message.embeds[0].fields[0].name) {
-                let specialtrade = message.embeds[0].fields[0].name;
+            const tradeField = message.embeds[0].fields[0];
+            if (tradeField && tradeField.name) {
+                let specialtrade = tradeField.name;
                 if (
                     specialtrade
                         .toLowerCase()
@@ -340,8 +358,9 @@ module.exports = async (client, message) => {
         }
 
         if (client.config.settings.event.autoarena) {
-            if (message.embeds[0].fields[0].name) {
-                let arena = message.embeds[0].fields[0].name;
+            const arenaField = message.embeds[0].fields[0];
+            if (arenaField && arenaField.name) {
+                let arena = arenaField.name;
                 if (arena.toLowerCase().includes("to join the arena!")) {
                     await message.clickButton();
                     client.global.totalarena = client.global.totalarena + 1;

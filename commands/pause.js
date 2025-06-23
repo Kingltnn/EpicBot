@@ -1,7 +1,7 @@
 module.exports = {
     config: {
-        name: "pause",
-        aliases: ["stop"],
+        name: "2",
+        aliases: ["4"],
     },
     run: async (client, message, args) => {
         if (client.global.paused) {

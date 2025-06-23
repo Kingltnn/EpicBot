@@ -42,6 +42,13 @@ async function inventory(client, channel, type = null) {
             }
         } while (message && message.author.id !== "555955826880413696");
 
+        // Kiểm tra message và embeds tồn tại
+        if (!message || !message.embeds || !message.embeds[0] || !message.embeds[0].fields) {
+            logger.warn("Farm", "Inventory", "Không thể đọc inventory: Message hoặc embeds không hợp lệ");
+            client.global.paused = false;
+            return;
+        }
+
         const fields = message.embeds[0].fields;
 
         if (type === "sell") {
@@ -61,59 +68,59 @@ async function inventory(client, channel, type = null) {
                     itemsitemsToCheck.push(type);
                 }
             }
-            const itemslines = itemsValue.split("\n");
-            inventorysellloopcounter = 0;
-            for (const line of itemslines) {
-                const trimmedLine = line.trim();
-                if (trimmedLine.toLowerCase().includes("no items")) {
-                    logger.warn("Farm", "Inventory", `No items left`);
-                } else {
-                    for (const item of itemsitemsToCheck) {
-                        if (trimmedLine.includes(item)) {
-                            const regex = new RegExp(
-                                `\\*\\*${item}\\*\\*: (\\d+)`
-                            );
-                            const match = trimmedLine.match(regex);
-                            if (match && match.length > 1) {
-                                const count = match[1];
-
-                                switch (inventorysellloopcounter) {
-                                    case 0:
-                                        await client.delay(2500);
-                                        inventorysellloopcounter++;
-                                        break;
-                                    case 1:
-                                        await client.delay(3500);
-                                        inventorysellloopcounter++;
-                                        break;
-                                    case 2:
-                                        await client.delay(4500);
-                                        inventorysellloopcounter++;
-                                        break;
-                                    case 4:
-                                        await client.delay(5500);
-                                        inventorysellloopcounter++;
-                                        break;
-                                    default:
-                                        await client.delay(6500);
-                                        inventorysellloopcounter++;
-                                        break;
-                                }
-
-                                await sell(
-                                    client,
-                                    channel,
-                                    item,
-                                    count,
-                                    "inventory"
+            if (itemsValue) {
+                const itemslines = itemsValue.split("\n");
+                inventorysellloopcounter = 0;
+                for (const line of itemslines) {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine.toLowerCase().includes("no items")) {
+                        logger.warn("Farm", "Inventory", `No items left`);
+                    } else {
+                        for (const item of itemsitemsToCheck) {
+                            if (trimmedLine.includes(item)) {
+                                const regex = new RegExp(
+                                    `\\*\\*${item}\\*\\*: (\\d+)`
                                 );
+                                const match = trimmedLine.match(regex);
+                                if (match && match.length > 1) {
+                                    const count = match[1];
+
+                                    switch (inventorysellloopcounter) {
+                                        case 0:
+                                            await client.delay(2500);
+                                            inventorysellloopcounter++;
+                                            break;
+                                        case 1:
+                                            await client.delay(3500);
+                                            inventorysellloopcounter++;
+                                            break;
+                                        case 2:
+                                            await client.delay(4500);
+                                            inventorysellloopcounter++;
+                                            break;
+                                        case 4:
+                                            await client.delay(5500);
+                                            inventorysellloopcounter++;
+                                            break;
+                                        default:
+                                            await client.delay(6500);
+                                            inventorysellloopcounter++;
+                                            break;
+                                    }
+
+                                    await sell(
+                                        client,
+                                        channel,
+                                        item,
+                                        count,
+                                        "inventory"
+                                    );
+                                }
                             }
                         }
                     }
                 }
             }
-            client.global.paused = false;
-            logger.info("Farm", "Inventory", `Paused: ${client.global.paused}`);
         } else if (type === "use") {
             let useconsumablesValue = null;
 
@@ -133,56 +140,58 @@ async function inventory(client, channel, type = null) {
                 }
             }
 
-            const useconsumableslines = useconsumablesValue.split("\n");
-            usecooldown = 0;
-            inventoryuseloopcounter = 0;
-            for (const line of useconsumableslines) {
-                const trimmedLine = line.trim();
+            if (useconsumablesValue) {
+                const useconsumableslines = useconsumablesValue.split("\n");
+                usecooldown = 0;
+                inventoryuseloopcounter = 0;
+                for (const line of useconsumableslines) {
+                    const trimmedLine = line.trim();
 
-                for (const item of useconsumablesitemsToCheck) {
-                    if (trimmedLine.includes(item)) {
-                        const regex = new RegExp(`\\*\\*${item}\\*\\*: (\\d+)`);
-                        const match = trimmedLine.match(regex);
-                        if (match && match.length > 1) {
-                            const count = match[1];
+                    for (const item of useconsumablesitemsToCheck) {
+                        if (trimmedLine.includes(item)) {
+                            const regex = new RegExp(`\\*\\*${item}\\*\\*: (\\d+)`);
+                            const match = trimmedLine.match(regex);
+                            if (match && match.length > 1) {
+                                const count = match[1];
 
-                            if (
-                                item.includes("lootbox") &&
-                                client.config.settings.inventory.lootbox.autouse
-                            ) {
-                                switch (inventoryuseloopcounter) {
-                                    case 0:
-                                        await client.delay(2500);
-                                        break;
-                                    case 1:
-                                        await client.delay(5500);
-                                        break;
-                                    case 2:
-                                        await client.delay(7500);
-                                        break;
-                                    case 4:
-                                        await client.delay(9500);
-                                        break;
-                                    default:
-                                        await client.delay(11500);
-                                        break;
+                                if (
+                                    item.includes("lootbox") &&
+                                    client.config.settings.inventory.lootbox.autouse
+                                ) {
+                                    switch (inventoryuseloopcounter) {
+                                        case 0:
+                                            await client.delay(2500);
+                                            break;
+                                        case 1:
+                                            await client.delay(5500);
+                                            break;
+                                        case 2:
+                                            await client.delay(7500);
+                                            break;
+                                        case 4:
+                                            await client.delay(9500);
+                                            break;
+                                        default:
+                                            await client.delay(11500);
+                                            break;
+                                    }
+
+                                    await use(
+                                        client,
+                                        channel,
+                                        item,
+                                        count,
+                                        "inventory"
+                                    );
+                                    inventoryuseloopcounter++;
                                 }
-
-                                await use(
-                                    client,
-                                    channel,
-                                    item,
-                                    count,
-                                    "inventory"
-                                );
-                                inventoryuseloopcounter++;
                             }
                         }
                     }
                 }
+            } else {
+                logger.warn("Farm", "Inventory", "No Consumables value found for use");
             }
-            client.global.paused = false;
-            logger.info("Farm", "Inventory", `Paused: ${client.global.paused}`);
         } else {
             let consumablesValue = null;
 
@@ -212,88 +221,91 @@ async function inventory(client, channel, type = null) {
                 }
             }
 
-            const consumableslines = consumablesValue.split("\n");
-            usecooldown = 0;
-            inventoryuseloopcounter = 0;
-            for (const line of consumableslines) {
-                const trimmedLine = line.trim();
+            if (consumablesValue) {
+                const consumableslines = consumablesValue.split("\n");
+                usecooldown = 0;
+                inventoryuseloopcounter = 0;
+                for (const line of consumableslines) {
+                    const trimmedLine = line.trim();
 
-                for (const item of consumablesitemsToCheck) {
-                    if (trimmedLine.includes(item)) {
-                        const regex = new RegExp(`\\*\\*${item}\\*\\*: (\\d+)`);
-                        const match = trimmedLine.match(regex);
-                        if (match && match.length > 1) {
-                            const count = match[1];
-                            if (
-                                item === "life potion" &&
-                                client.config.settings.inventory.lifepotion
-                                    .autouse
-                            ) {
-                                client.global.inventory.lifepotion = count;
-                                client.global.limits.lifepotionhplimit =
-                                    client.config.settings.inventory.lifepotion.hplimit;
-                            } else if (item === "time cookie") {
-                                client.global.inventory.timecookie = count;
-                            } else if (
-                                item.includes("lootbox") &&
-                                client.config.settings.inventory.lootbox.autouse
-                            ) {
-                                switch (inventoryuseloopcounter) {
-                                    case 0:
-                                        await client.delay(2500);
-                                        break;
-                                    case 1:
-                                        await client.delay(5500);
-                                        break;
-                                    case 2:
-                                        await client.delay(7500);
-                                        break;
-                                    case 4:
-                                        await client.delay(9500);
-                                        break;
-                                    default:
-                                        await client.delay(11500);
-                                        break;
-                                }
+                    for (const item of consumablesitemsToCheck) {
+                        if (trimmedLine.includes(item)) {
+                            const regex = new RegExp(`\\*\\*${item}\\*\\*: (\\d+)`);
+                            const match = trimmedLine.match(regex);
+                            if (match && match.length > 1) {
+                                const count = match[1];
+                                if (
+                                    item === "life potion" &&
+                                    client.config.settings.inventory.lifepotion
+                                        .autouse
+                                ) {
+                                    client.global.inventory.lifepotion = count;
+                                    client.global.limits.lifepotionhplimit =
+                                        client.config.settings.inventory.lifepotion.hplimit;
+                                } else if (item === "time cookie") {
+                                    client.global.inventory.timecookie = count;
+                                } else if (
+                                    item.includes("lootbox") &&
+                                    client.config.settings.inventory.lootbox.autouse
+                                ) {
+                                    switch (inventoryuseloopcounter) {
+                                        case 0:
+                                            await client.delay(2500);
+                                            break;
+                                        case 1:
+                                            await client.delay(5500);
+                                            break;
+                                        case 2:
+                                            await client.delay(7500);
+                                            break;
+                                        case 4:
+                                            await client.delay(9500);
+                                            break;
+                                        default:
+                                            await client.delay(11500);
+                                            break;
+                                    }
 
-                                await use(
-                                    client,
-                                    channel,
-                                    item,
-                                    count,
-                                    "inventory"
-                                );
-                                inventoryuseloopcounter++;
-                            } else if (
-                                item.includes("seed") &&
-                                client.config.commands.progress.farm.enable
-                            ) {
-                                switch (item) {
-                                    case "seed":
-                                        client.global.inventory.farm.seed =
-                                            count;
-                                        break;
-                                    case "potato seed":
-                                        client.global.inventory.farm.potatoseed =
-                                            count;
-                                        break;
-                                    case "carrot seed":
-                                        client.global.inventory.farm.carrotseed =
-                                            count;
-                                        break;
-                                    case "bread seed":
-                                        client.global.inventory.farm.breadseed =
-                                            count;
-                                        break;
-                                    default:
-                                        break;
+                                    await use(
+                                        client,
+                                        channel,
+                                        item,
+                                        count,
+                                        "inventory"
+                                    );
+                                    inventoryuseloopcounter++;
+                                } else if (
+                                    item.includes("seed") &&
+                                    client.config.commands.progress.farm.enable
+                                ) {
+                                    switch (item) {
+                                        case "seed":
+                                            client.global.inventory.farm.seed =
+                                                count;
+                                            break;
+                                        case "potato seed":
+                                            client.global.inventory.farm.potatoseed =
+                                                count;
+                                            break;
+                                        case "carrot seed":
+                                            client.global.inventory.farm.carrotseed =
+                                                count;
+                                            break;
+                                        case "bread seed":
+                                            client.global.inventory.farm.breadseed =
+                                                count;
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            } else {
+                logger.warn("Farm", "Inventory", "No Consumables value found");
             }
-            //
             client.global.paused = false;
             logger.info("Farm", "Inventory", `Paused: ${client.global.paused}`);
             if (usecooldown > 0) {
@@ -359,6 +371,7 @@ async function checkcooldowns(client, channel) {
             axecooldown,
             netcooldown,
             laddercooldown,
+            lootboxcooldown,
             progressworkingdisabled,
             progressworkingmultivalue;
 
@@ -437,6 +450,17 @@ async function checkcooldowns(client, channel) {
             const lines = value.split("\n");
             lines.forEach((line) => {
                 const trimmedLine = line.trim();
+                // Kiểm tra nếu lootbox sẵn sàng (không có cooldown)
+                if (trimmedLine.includes("lootbox")) {
+                    if (trimmedLine.includes(":white_check_mark:") || trimmedLine.includes("✅")) {
+                        lootboxcooldown = 0;
+                        logger.info(
+                            "Farm",
+                            "Cooldowns",
+                            `Lootbox Cooldown: ${lootboxcooldown}ms`
+                        );
+                    }
+                }
                 itemsToCheck.forEach((item) => {
                     if (trimmedLine.includes(item)) {
                         const cooldown = extractCooldown(trimmedLine);
@@ -566,8 +590,9 @@ async function checkcooldowns(client, channel) {
                                     );
                                 }
                                 if (
-                                    client.config.commands.progress.working
-                                        .axe &&
+                                    client.config.commands.progress.working.axe ||
+                                    client.config.commands.progress.working.pickaxe ||
+                                    client.config.commands.progress.working.drill &&
                                     !progressworkingmultivalue
                                 ) {
                                     axecooldown = timetoms(cooldown);
@@ -601,6 +626,16 @@ async function checkcooldowns(client, channel) {
                                         `Ladder Cooldown: ${laddercooldown}ms`
                                     );
                                 }
+                            }
+                            if (
+                                item === "lootbox"
+                            ) {
+                                lootboxcooldown = timetoms(cooldown);
+                                logger.info(
+                                    "Farm",
+                                    "Cooldowns",
+                                    `Lootbox Cooldown: ${lootboxcooldown}ms`
+                                );
                             }
                         }
                     }
@@ -648,6 +683,53 @@ async function checkcooldowns(client, channel) {
                 }
             }
         }
+
+        // Auto buy lootbox - đặt trước hunt
+        if (
+            typeof lootboxcooldown !== 'undefined' &&
+            lootboxcooldown <= 0 &&
+            client.config.settings.lootbox === true
+        ) {
+            // Lấy loại lootbox được bật trong config
+            const buyTypes = client.config.settings.lootbox_buy && client.config.settings.lootbox_buy.types ? client.config.settings.lootbox_buy.types : {};
+            // Ưu tiên: EDGY, EPIC, rare
+            const lootboxTypes = ["EDGY lootbox", "EPIC lootbox", "rare lootbox"];
+            let bought = false;
+            for (const lbType of lootboxTypes) {
+                if (buyTypes[lbType]) {
+                    try {
+                        // Thêm delay trước khi mua để tránh spam
+                        await client.delay(5000);
+                        
+                        // Gửi lệnh mua
+                        await channel.send({ content: `rpg buy ${lbType}` });
+                        bought = true;
+                        logger.info("Farm", "Auto Buy", `Successfully bought ${lbType}`);
+                        
+                        // Gửi webhook nếu có cấu hình
+                        if (client.config.settings.lootbox_webhook_url) {
+                            try {
+                                await client.axios.post(client.config.settings.lootbox_webhook_url, {
+                                    content: `Đã mua thành công **${lbType}** lúc ${new Date().toLocaleString()}`
+                                });
+                            } catch (webhookError) {
+                                logger.warn("Farm", "Auto Buy", `Failed to send webhook: ${webhookError.message}`);
+                            }
+                        }
+                        
+                        // Sau khi mua thành công, đợi cooldown thực tế từ rpg cd
+                        setTimeout(() => {
+                            checkcooldowns(client, channel);
+                        }, 10800000); // 3 giờ = 3 * 60 * 60 * 1000 = 10800000ms
+                        
+                        break;
+                    } catch (error) {
+                        logger.warn("Farm", "Auto Buy", `Failed to buy ${lbType}: ${error.message}`);
+                    }
+                }
+            }
+        }
+
         if (client.config.commands.experience.hunt) {
             if (dailycooldown <= 0) {
                 if (huntcooldown > 0) {
@@ -729,13 +811,19 @@ async function checkcooldowns(client, channel) {
             }
         }
         if (
-            client.config.commands.progress.working.axe &&
+            client.config.commands.progress.working.axe ||
+            client.config.commands.progress.working.pickaxe ||
+            client.config.commands.progress.working.drill &&
             !progressworkingmultivalue
         ) {
             if (axecooldown > 0) {
-                working(client, channel, "axe", axecooldown + 3500);
+                if (client.config.commands.progress.working.axe) working(client, channel, "axe", axecooldown + 3500);
+                if (client.config.commands.progress.working.pickaxe) working(client, channel, "pickaxe", axecooldown + 3500);
+                if (client.config.commands.progress.working.drill) working(client, channel, "drill", axecooldown + 3500);
             } else {
-                working(client, channel, "axe", 7500);
+                if (client.config.commands.progress.working.axe) working(client, channel, "axe", 7500);
+                if (client.config.commands.progress.working.pickaxe) working(client, channel, "pickaxe", 7500);
+                if (client.config.commands.progress.working.drill) working(client, channel, "drill", 7500);
             }
         }
         if (
@@ -786,7 +874,7 @@ async function hunt(client, channel, extratime = 0) {
             if (client.config.settings.autophrases) {
                 setTimeout(async () => {
                     await elaina2(client, channel);
-                }, 1000);
+                }, 10000);
             }
 
             await channel.send({ content: "rpg hunt" }).then(async () => {
@@ -822,7 +910,7 @@ async function hunt(client, channel, extratime = 0) {
                 if (client.config.settings.autophrases) {
                     setTimeout(async () => {
                         await elaina2(client, channel);
-                    }, 1000);
+                    }, 10000);
                 }
             });
         }
@@ -881,6 +969,11 @@ async function hunt(client, channel, extratime = 0) {
                     await inventory(client, channel, "sell");
                     await client.delay(5000);
                 }
+                if (client.config.settings.autophrases) {
+                    setTimeout(async () => {
+                        await elaina2(client, channel);
+                    }, 10000);
+                }
             });
         } else {
             await channel.send({ content: "rpg hunt" }).then(async () => {
@@ -894,6 +987,11 @@ async function hunt(client, channel, extratime = 0) {
                     await client.delay(2000);
                     await inventory(client, channel, "sell");
                     await client.delay(5000);
+                }
+                if (client.config.settings.autophrases) {
+                    setTimeout(async () => {
+                        await elaina2(client, channel);
+                    }, 10000);
                 }
             });
         }
@@ -1006,14 +1104,14 @@ async function farm(client, channel, extratime = 0) {
             client.global.training
         )
             return;
-        if (client.global.inventory.farm.seed >= 1) {
-            farmseedtype = "basic";
-        } else if (client.global.inventory.farm.potatoseed >= 1) {
-            farmseedtype = "potato seed";
+        if (client.global.inventory.farm.breadseed >= 1) {
+            farmseedtype = "bread seed";
         } else if (client.global.inventory.farm.carrotseed >= 1) {
             farmseedtype = "carrot seed";
-        } else if (client.global.inventory.farm.breadseed >= 1) {
-            farmseedtype = "bread seed";
+        } else if (client.global.inventory.farm.potatoseed >= 1) {
+            farmseedtype = "potato seed";
+        } else if (client.global.inventory.farm.seed >= 1) {
+            farmseedtype = "basic";
         }
 
         await channel.send({ content: `rpg farm ${farmseedtype}` }).then(() => {
@@ -1032,14 +1130,14 @@ async function farm(client, channel, extratime = 0) {
             client.global.training
         )
             return;
-        if (client.global.inventory.farm.seed >= 1) {
-            farmseedtype = "basic";
-        } else if (client.global.inventory.farm.potatoseed >= 1) {
-            farmseedtype = "potato seed";
+        if (client.global.inventory.farm.breadseed >= 1) {
+            farmseedtype = "bread seed";
         } else if (client.global.inventory.farm.carrotseed >= 1) {
             farmseedtype = "carrot seed";
-        } else if (client.global.inventory.farm.breadseed >= 1) {
-            farmseedtype = "bread seed";
+        } else if (client.global.inventory.farm.potatoseed >= 1) {
+            farmseedtype = "potato seed";
+        } else if (client.global.inventory.farm.seed >= 1) {
+            farmseedtype = "basic";
         }
         await channel.send({ content: `rpg farm ${farmseedtype}` }).then(() => {
             logger.info("Farm", "Progress-Farm", `Type: ${farmseedtype}`);

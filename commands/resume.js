@@ -1,6 +1,6 @@
 module.exports = {
     config: {
-        name: "resume",
+        name: "3",
     },
     run: async (client, message, args) => {
         if (client.global.paused) {

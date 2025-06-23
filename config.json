@@ -1,31 +1,29 @@
 {
-    "midoservices_authkey": "",
-
-    "prefix": "e!",
+    "prefix": "",
     "token": "",
     "channelid": "",
     "userid": "",
     "commands": {
         "rewards": {
-            "daily": false,
-            "weekly": false,
+            "daily": true,
+            "weekly": true,
             "vote": {
                 "enable": false
             }
         },
         "experience": {
-            "hunt": false,
-            "adventure": false,
-            "training": false
+            "hunt": true,
+            "adventure": true,
+            "training": true
         },
         "progress": {
             "farm": {
-                "enable": false,
+                "enable": true,
                 "types": {
-                    "seed": false,
-                    "potato seed": false,
-                    "carrot seed": false,
-                    "bread seed": false
+                    "seed": true,
+                    "potato seed": true,
+                    "carrot seed": true,
+                    "bread seed": true
                 }
             },
             "working": {
@@ -34,6 +32,8 @@
                 "pickup": false,
                 "mine": false,
                 "axe": false,
+                "pickaxe": true,
+                "drill": false,
                 "net": false,
                 "ladder": false
             }
@@ -41,26 +41,26 @@
     },
     "settings": {
         "discordrpc": true,
-        "autophrases": false,
+        "autophrases": true,
         "event": {
-            "autojoin": false,
-            "autospecialtrade": false,
-            "autoarena": false
+            "autojoin": true,
+            "autospecialtrade": true,
+            "autoarena": true
         },
-
+        "captcha_alert_channelid": "https://discord.com/api/webhooks/1379633373735288942/zysRbg09bdw736bWSf77gzqLhNzvWbafSyjyMbP1w2KF26BqT-8sgK2B3H3XuUPyQf_U",
         "inventory": {
-            "check": false,
+            "check": true,
             "lifepotion": {
-                "autouse": false,
-                "hplimit": 170
+                "autouse": true,
+                "hplimit": 10
             },
             "lootbox": {
-                "autouse": false,
+                "autouse": true,
                 "types": {
-                    "common lootbox": false,
-                    "uncommon lootbox": false,
-                    "rare lootbox": false,
-                    "EPIC lootbox": false,
+                    "common lootbox": true,
+                    "uncommon lootbox": true,
+                    "rare lootbox": true,
+                    "EPIC lootbox": true,
                     "EDGY lootbox": false,
                     "OMEGA lootbox": false
                 }
@@ -87,6 +87,15 @@
                     "wolf skin": false,
                     "zombie eye": false
                 }
+            }
+        },
+        "lootbox": true,
+        "lootbox_webhook_url": "https://discord.com/api/webhooks/1386524045633126410/Ihca_TGVcvXtIaA25ITeUYICxlWZoPGQSoMKQRhVLKjdx8BRnPezlnxkilsxo5pvL5Xi",
+        "lootbox_buy": {
+            "types": {
+                "rare lootbox": false,
+                "EPIC lootbox": false,
+                "EDGY lootbox": true
             }
         }
     }
